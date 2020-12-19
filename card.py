@@ -6,7 +6,6 @@ SUIT_DICT = {
 }
 
 CARD_DICT = {
-    "A": {"name": "Ace", "rank": 1},
     "2": {"name": "Two", "rank": 2},
     "3": {"name": "Three", "rank": 3},
     "4": {"name": "Four", "rank": 4},
@@ -18,7 +17,8 @@ CARD_DICT = {
     "T": {"name": "Ten", "rank": 10},
     "J": {"name": "Jack", "rank": 11},
     "Q": {"name": "Queen", "rank": 12},
-    "K": {"name": "King", "rank": 13}
+    "K": {"name": "King", "rank": 13},
+    "A": {"name": "Ace", "rank": 14}
 }
 
 class Card:
@@ -39,11 +39,7 @@ class Card:
             Examples: Ad = ace of diamonds, 7c = seven of clubs
 
     """
-    
-    def __init__(self, face: str, suit: str):
-        self.face = face
-        self.suit = suit
-    
+     
     @property
     def face(self):
         return self._face
@@ -66,17 +62,22 @@ class Card:
 
     @property
     def rank(self):
-        return CARD_DICT[self.name]['rank']
+        return CARD_DICT[self.face]['rank']
 
     @property
     def label(self):
         return self.face + self.suit
+
+    def __init__(self, face: str, suit: str):
+        self.face = face
+        self.suit = suit
 
     def __eq__(self, other):
         return (self.face == other.face and self.suit == other.suit)
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
 
 def test_Card():
     c1 = Card('7','d')
@@ -89,4 +90,6 @@ def test_Card():
     print('c1 != c2: ' + str(c1 != c2))
     print('c2 == c3: ' + str(c2 == c3))
 
-# test_Card()
+
+if __name__ == '__main__':
+    test_Card()

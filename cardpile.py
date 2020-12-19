@@ -14,11 +14,6 @@ class CardPile:
 
     """
 
-    def __init__(self, visible = False):
-        self.cards = []
-        self.visible = visible
-
-
     @property
     def cards(self):
         return self._cards
@@ -34,16 +29,10 @@ class CardPile:
     @visible.setter
     def visible(self, value: bool):
         self._visible = value
-    
 
-    def contains_card(self, card: Card):
-        # Check if any card in the pile matches a particular card value (e.g. '7c')
-        # If so, return a reference to the matching card in the pile
-        for c in self.cards:
-            if c == card: 
-                return c
-        return None
-
+    def __init__(self, visible = False):
+        self.cards = []
+        self.visible = visible
 
     def add_card(self, card: Card, source_pile = None):
         c = card
@@ -58,6 +47,54 @@ class CardPile:
         # After removing card from source pile, add it to this card pile
         self.cards.append(c)
         return c
+
+    def contains_card(self, card: Card):
+        # Check if any card in the pile matches a particular card value (e.g. '7c')
+        # If so, return a reference to the matching card in the pile
+        for c in self.cards:
+            if c == card: 
+                return c
+        return None
+
+    def count_by_suit(self, suits = ['c','d','h','s']):
+        # Returns a dictionary with suit and count of cards
+        # Example: count_by_suit(['c','d','h','s']) 
+        suit_count = dict()
+        for s in suits:
+            suit_count[s] = 0
+        for c in self.cards:
+            suit_count[c.suit] = suit_count.get(c.suit,0) + 1 
+        return suit_count
+
+    def display_cards(self):
+        s = ''
+        for c in self.cards:
+            s = s + c.label + ' '
+        return s
+
+    def extract_cards(self, faces):
+        # Get cards that match a set of faces - also returns the remaining cards
+        # Example: extract_cards(['A', '8'], [Card(Ah), Card(8c), Card(Ks), Card(4h)])
+        # returns match = [Card(Ah), Card(8c)] and remainder = [Card(Ks), Card(4h)]
+        match = CardPile()
+        remainder = CardPile()
+        for c in self.cards:
+            for f in faces:
+                if c.face == f:
+                    match.add_card(c)
+                else:
+                    remainder.add_card(c)
+        return (match, remainder)
+
+    def get_highest_card_by_suit(self, suits = ['c','d','h','s']):
+        # Returns dictionary with highest ranking card in each suit
+        suit_rank = dict()
+        for s in suits:
+            suit_rank[s] = 0
+        for c in self.cards:
+            if c.rank > suit_rank[c.suit]:
+                suit_rank[c.suit] = c.rank
+        return suit_rank
 
     def pop_card(self, pos: int):
         if len(self.cards) >= pos + 1:
@@ -78,11 +115,6 @@ class CardPile:
     def shuffle_cards(self):
         random.shuffle(self.cards)
 
-    def display_cards(self):
-        s = ''
-        for c in self.cards:
-            s = s + c.label + ' '
-        return s
 
 def standard_deck():
     # Create standard deck
@@ -93,13 +125,14 @@ def standard_deck():
             deck.add_card(card)
     return deck
 
+
 def test_CardPile():
     cp = CardPile()
     cp2 = CardPile()
     c1 = Card('A','c')
     c2 = Card('K','d')
     c3 = Card('7','s')
-    c4 = Card('7','s')
+    c4 = Card('7','c')
     cp.add_card(c1)
     cp.add_card(c2)
     cp2.add_card(c3)
@@ -126,7 +159,22 @@ def test_CardPile():
     top_card = deck.pop_card(0)
     print('top card ' + top_card.label)
     print('deck ' + deck.display_cards())
+    pile = CardPile()
+    pile.add_card(c1)
+    pile.add_card(c2)
+    pile.add_card(c3)
+    pile.add_card(c4)
+    sevens, non_sevens = pile.extract_cards(['7'])
+    print('pile: ' + pile.display_cards())
+    print('sevens: ' + sevens.display_cards())
+    print('non-sevens: ' + non_sevens.display_cards())
+
+    suits = pile.count_by_suit()    
+    print('suits: ', suits)
+
+    ranks = pile.get_highest_card_by_suit()
+    print('ranks ', ranks)
+
     
-
-
-# test_CardPile()
+if __name__ == '__main__':
+    test_CardPile()

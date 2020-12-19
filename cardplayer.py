@@ -47,16 +47,6 @@ class CardPlayer:
     def hand(self, value):
         self._hand = value
 
-    # @property
-    # def drawn(self):
-    #     return self._drawn
-
-    # @drawn.setter
-    # def drawn(self, value):
-    #     self._drawn = value
-
-
-
 
 def test_CardPlayer():
     p1 = CardPlayer('Player1',False)
@@ -66,4 +56,6 @@ def test_CardPlayer():
     print('p1 hand: ', p1.hand.display_cards())
     # print('p1 drawn: ', p1.drawn.display_cards())
 
-# test_CardPlayer()
+
+if __name__ == '__main__':
+    test_CardPlayer()
