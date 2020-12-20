@@ -28,11 +28,16 @@ class CardGame:
     max_times_recycling_discard_pile = 5
     times_recycling_discard_pile = 0
 
-    def __init__(self, players, num_cards):
+    def __init__(self, players, num_cards, is_interactive = False):
         self.completed = False
         self.curr_player = None
         self.num_cards = num_cards
         self.players = players
+        self.is_interactive = is_interactive
+        if is_interactive:
+            self.players[0].isManual = True
+            self.players[0].name = input('Enter player name: ')
+            
 
     def deal_cards(self, num_cards: int):
         i = 0
@@ -45,7 +50,10 @@ class CardGame:
         print('')
         print(self.name)
         for p in self.players:
-            print(p.name + ': ' + p.hand.display_cards())
+            if self.is_interactive and p.isManual == False:
+                print(p.name + ': ' + str(len(p.hand.cards)) + ' cards')
+            else: 
+                print(p.name + ': ' + p.hand.display_cards())
         if len(self.discard_pile.cards) == 0:
             print('Discard pile: ')
         else:
@@ -56,7 +64,10 @@ class CardGame:
 
         card = self.deck.pop_card(0)
         player.hand.add_card(card)
-        print(player.name + ' draws a card')
+        if self.is_interactive and player.isManual == False:
+            print(player.name + ' draws a card')
+        else:
+            print(player.name + ' draws ' + card.label)
         if len(self.deck.cards) == 0:
             if self.times_recycling_discard_pile < self.max_times_recycling_discard_pile:
                 self.recycle_discard_pile()
@@ -108,17 +119,34 @@ class CardGame:
         # Draw a card from the deck
         if choice == 1:
             card = self.draw_card(self.curr_player)
-            print(self.curr_player.name + ' draws ' + card.label)
+
         # Play a card from the hand - in this case it goes on the discard pile
         else:
-            # card = self.curr_player.hand.pop_card(0)
             playable_cards = self.find_playable_cards(self.curr_player)
             card = self.select_card_to_play(self.curr_player, playable_cards)
             self.play_card(card, self.curr_player)
-            print('play_turn_auto: ' + self.curr_player.name + ' discards ' + card.label)
         return
 
     def play_turn_manual(self):
+        move = ''
+        while not move:
+            move = input('Type in d to draw a card, or type a card from your hand (e.g. Kc) to play: ')
+            if move == 'd':
+                card = self.draw_card(self.curr_player)
+                print(self.curr_player.name + ' draws ' + card.label)
+                continue
+            if len(move) == 2:
+                try: 
+                    face = move[0]
+                    rank = move[1]
+                    card = Card(face, rank)
+                    if self.curr_player.hand.contains_card(card):
+                        self.play_card(card, self.curr_player)
+                except: 
+                    move = ''
+                    continue
+            else:
+                move = ''
         return
     
     def recycle_discard_pile(self):
@@ -134,7 +162,8 @@ class CardGame:
     def select_card_to_play(self, player: CardPlayer, playable_cards: CardPile):
         # For this basic card game, just select the first one
         if len(playable_cards.cards) > 0:
-            card = playable_cards.pop_card(0)
+            # card = playable_cards.pop_card(0)
+            card = playable_cards.cards[0]
             return card
         else:
             return None
@@ -169,8 +198,10 @@ def test_CardGame():
     p1 = CardPlayer('p1')
     p2 = CardPlayer('p2')
     p3 = CardPlayer('p3')
+    players = [p1,p2]
 
-    game = CardGame(players = [p1,p2,p3], num_cards=5)
+    # game = CardGame(players, num_cards=5, is_interactive=True)
+    game = CardGame(players, num_cards=5)
     game.setup_game()
     game.display_game()
     game.play_game()

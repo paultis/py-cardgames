@@ -103,9 +103,11 @@ class CrazyEights(CardGame):
 def test_CrazyEights():
     p1 = CardPlayer('p1')
     p2 = CardPlayer('p2')
-    p3 = CardPlayer('p3')
+    # p3 = CardPlayer('p3')
+    players = [p1,p2]
 
-    game = CrazyEights(players = [p1,p2,p3], num_cards=5)
+    # game = CrazyEights(players = players, num_cards=5)
+    game = CrazyEights(players, num_cards=5, is_interactive=True)
     game.setup_game()
     game.display_game()
     game.play_game()
